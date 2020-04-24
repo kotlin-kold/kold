@@ -4,12 +4,9 @@ import com.paralainer.kold.utils.orNull
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bind
 import io.kotest.property.arbitrary.choice
-import io.kotest.property.arbitrary.choose
-import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
-import kotlin.math.max
 
 val ValueViolationArb: Arb<ValueViolation> = Arb.bind(
     Arb.string(),

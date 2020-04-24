@@ -41,7 +41,6 @@ class ValidationContext(
 
     fun Validated<KoldValue>.long(): Validated<Long> = this.flatMap { it.long() }
 
-
     fun KoldValue.double(): Validated<Double> =
         this.number { config.invalidValue }.flatMap { it.toDouble().valid() }
 
