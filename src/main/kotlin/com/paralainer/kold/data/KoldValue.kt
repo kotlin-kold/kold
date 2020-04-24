@@ -5,7 +5,17 @@ import com.paralainer.kold.validated.ValueViolation
 import com.paralainer.kold.validated.invalid
 import com.paralainer.kold.validated.valid
 
-class KoldValue private constructor(private val value: Any) {
+class KoldValue private constructor(internal val value: Any) {
+    companion object {
+        fun fromString(s: String) = KoldValue(s)
+        fun fromNumber(n: Number) = KoldValue(n)
+        fun fromBoolean(b: Boolean) = KoldValue(b)
+        fun fromCollection(c: Collection<KoldValue?>) =
+            KoldValue(c.toList())
+
+        fun fromObject(data: KoldData) = KoldValue(data)
+    }
+
     fun string(onInvalid: () -> ValueViolation): Validated<String> =
         (value as? String)?.valid() ?: onInvalid().invalid()
 
@@ -21,13 +31,18 @@ class KoldValue private constructor(private val value: Any) {
     fun obj(onInvalid: () -> ValueViolation): Validated<KoldData> =
         (value as? KoldData)?.valid() ?: onInvalid().invalid()
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is KoldValue) return false
 
-    companion object {
-        fun fromString(s: String) = KoldValue(s)
-        fun fromNumber(n: Number) = KoldValue(n)
-        fun fromCollection(c: Collection<KoldValue?>) =
-            KoldValue(c.toList())
+        if (value != other.value) return false
 
-        fun fromObject(data: KoldData) = KoldValue(data)
+        return true
     }
+
+    override fun hashCode(): Int {
+        return value.hashCode()
+    }
+
+
 }

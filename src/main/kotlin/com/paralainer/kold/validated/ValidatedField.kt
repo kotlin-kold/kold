@@ -1,7 +1,5 @@
 package com.paralainer.kold.validated
 
-import com.paralainer.kold.data.KoldValue
-
 data class ValidatedField<T>(val fieldName: String, val value: Validated<T>) {
     fun <R> convertValue(block: (T) -> R): ValidatedField<R> =
         validateValue { block(it).valid() }
@@ -17,7 +15,7 @@ data class ValidatedField<T>(val fieldName: String, val value: Validated<T>) {
                 ValidatedField(fieldName, validated)
             },
             onInvalid = {
-                ValidatedField(fieldName, Validated.Invalid(it.violations))
+                this as ValidatedField<R> // we are saving a memory allocation by casting instead of reconstructing
             }
         )
 }
@@ -27,12 +25,3 @@ fun <T> T.validField(fieldName: String): ValidatedField<T> =
 
 fun <T> ValueViolation.invalidField(fieldName: String): ValidatedField<T> =
     ValidatedField(fieldName, Validated.Invalid(listOf(FieldViolation(fieldName, listOf(this)))))
-
-data class OptionalField(val fieldName: String, private val value: KoldValue?) {
-    fun <R> validateOption(block: (KoldValue) -> Validated<R>): ValidatedField<R?> =
-        if (value == null) {
-            null.validField(fieldName)
-        } else {
-            value.validField(fieldName).validateValue(block).convertValue { it as R? }
-        }
-}

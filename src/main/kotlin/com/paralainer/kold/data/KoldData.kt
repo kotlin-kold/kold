@@ -1,6 +1,6 @@
 package com.paralainer.kold.data
 
-class KoldData(private val data: Map<String, KoldValue?>) {
+class KoldData(internal val data: Map<String, KoldValue?>) {
     operator fun get(fieldName: String): KoldValue? = data[fieldName]
     fun contains(fieldName: String): Boolean = data.containsKey(fieldName)
 
@@ -22,17 +22,27 @@ class KoldData(private val data: Map<String, KoldValue?>) {
         private fun parseValue(rawValue: Any?): KoldValue? =
             when (rawValue) {
                 null -> null
-                is Collection<*> -> KoldValue.fromCollection(rawValue.map {
-                    parseValue(
-                        it
-                    )
-                })
+                is Collection<*> -> KoldValue.fromCollection(rawValue.map { parseValue(it) })
                 is Map<*, *> -> KoldValue.fromObject(parseMap(rawValue))
                 is Number -> KoldValue.fromNumber(rawValue)
                 is String -> KoldValue.fromString(rawValue)
+                is Boolean -> KoldValue.fromBoolean(rawValue)
                 else ->
                     throw KoldDataParsingException("Value of unexpected type ${rawValue::class} found")
             }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is KoldData) return false
+
+        if (data != other.data) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return data.hashCode()
     }
 }
 

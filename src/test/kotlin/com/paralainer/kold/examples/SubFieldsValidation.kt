@@ -1,6 +1,7 @@
+/*
 package com.paralainer.kold.examples
 
-import com.paralainer.kold.context.combineValidations
+import com.paralainer.kold.context.validateFields
 import com.paralainer.kold.context.validationContext
 import com.paralainer.kold.data.KoldData
 import com.paralainer.kold.validated.Validated
@@ -29,7 +30,7 @@ class SubFieldsValidation : StringSpec() {
 
     private fun validatePhoneNumber(input: KoldData): Validated<PhoneNumber> =
         input.validationContext {
-            combineValidations(
+            validateFields(
                 opt("type").validateOption { type -> type.string() },
                 require("value").validateValue { value -> value.string() },
                 require("index").validateValue { value -> value.int() }
@@ -40,7 +41,7 @@ class SubFieldsValidation : StringSpec() {
 
     private fun validateSettings(input: KoldData): Validated<Settings> =
         input.validationContext {
-            combineValidations(
+            validateFields(
                 require("verified").validateValue { it.bool() },
                 opt("tags").validateOption {
                     it.list().validateElements { el -> el.notNull().string() }
@@ -53,7 +54,7 @@ class SubFieldsValidation : StringSpec() {
 
     private fun validateUser(input: KoldData): Validated<User> =
         input.validationContext {
-            combineValidations(
+            validateFields(
                 require("name").validateValue { it.string() },
                 opt("password").validateOption { it.string() },
                 require("age").validateValue { it.long() },
@@ -122,3 +123,4 @@ class SubFieldsValidation : StringSpec() {
 }
 
 
+*/

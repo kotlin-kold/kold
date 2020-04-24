@@ -1,6 +1,7 @@
+/*
 package com.paralainer.kold.examples
 
-import com.paralainer.kold.context.combineValidations
+import com.paralainer.kold.context.validateFields
 import com.paralainer.kold.context.validationContext
 import com.paralainer.kold.data.KoldData
 import com.paralainer.kold.validated.Validated
@@ -10,7 +11,7 @@ class SimpleValidation : StringSpec() {
 
     private fun validateUser(input: KoldData): Validated<User> =
         input.validationContext {
-            combineValidations(
+            validateFields(
                 require("name").validateValue { it.string() },
                 opt("password").validateOption { it.string() },
                 require("age").validateValue { it.long() },
@@ -62,3 +63,4 @@ class SimpleValidation : StringSpec() {
     private val inputs = arrayOf(validInput, invalidInput)
 }
 
+*/

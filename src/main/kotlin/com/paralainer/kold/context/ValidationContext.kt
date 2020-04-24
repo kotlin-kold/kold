@@ -2,11 +2,18 @@ package com.paralainer.kold.context
 
 import com.paralainer.kold.data.KoldData
 import com.paralainer.kold.data.KoldValue
-import com.paralainer.kold.validated.*
+import com.paralainer.kold.validated.ElementsViolation
+import com.paralainer.kold.validated.OptionalField
+import com.paralainer.kold.validated.Validated
+import com.paralainer.kold.validated.ValidatedField
+import com.paralainer.kold.validated.invalid
+import com.paralainer.kold.validated.invalidField
+import com.paralainer.kold.validated.valid
+import com.paralainer.kold.validated.validField
 
 class ValidationContext(
-    private val data: KoldData,
-    private val config: ValidationContextDefaults = ValidationContextDefaults()
+    val data: KoldData,
+    val config: ValidationContextConfig = ValidationContextConfig()
 ) {
 
     fun require(fieldName: String): ValidatedField<KoldValue> =
@@ -92,12 +99,7 @@ fun <T, R> T?.validateOption(block: (T) -> Validated<R>): Validated<R?> =
         block(this).flatMap { Validated.Valid(it as R?) }
 
 
-fun <R> KoldData.validationContext(validation: ValidationContext.() -> Validated<R>): Validated<R> =
-    validation(ValidationContext(this))
-
-fun <R> Validated<KoldData>.validationContext(validation: ValidationContext.() -> Validated<R>): Validated<R> =
-    this.flatMap {
-        validation(ValidationContext(it))
-    }
+fun <R> KoldData.validationContext(config: ValidationContextConfig = ValidationContextConfig(), validation: ValidationContext.() -> Validated<R>): Validated<R> =
+    validation(ValidationContext(this, config))
 
 
