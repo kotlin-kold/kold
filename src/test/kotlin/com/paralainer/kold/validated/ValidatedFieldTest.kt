@@ -11,50 +11,47 @@ import io.kotest.property.checkAll
 class ValidatedFieldTest : WordSpec() {
     init {
         "ValidatedField.convertValue" should {
-            "convert value when it's Valid" {
+            "convert value when it's ValidField" {
                 checkAll(validFieldArb(Arb.string())) { validField ->
                     val result = validField.convertValue { it.toUpperCase() }
 
-                    result shouldBe ValidatedField(
+                    result shouldBe ValidField(
                         validField.fieldName,
-                        Validated.Valid((validField.value as Validated.Valid<String>).value.toUpperCase())
+                        validField.value.toUpperCase()
                     )
                 }
             }
 
-            "doesn't modify value when it's Invalid" {
+            "doesn't modify value when it's InvalidField" {
                 checkAll(invalidFieldArb<String>()) { invalidField ->
                     val result = invalidField.convertValue { it.toUpperCase() }
 
-                    result shouldBe ValidatedField(
-                        invalidField.fieldName,
-                        invalidField.value
-                    )
-
-                    invalidField.value shouldBeSameInstanceAs result.value
+                    result shouldBeSameInstanceAs invalidField
                 }
             }
         }
 
         "ValidatedField.validateValue" should {
-            "convert value when it's Valid" {
+            "convert value when it's ValidField" {
                 checkAll(validFieldArb(Arb.string())) { validField ->
                     val result = validField.validateValue { Validated.Valid(it.toUpperCase()) }
 
-                    result shouldBe ValidatedField(
+                    result shouldBe ValidField(
                         validField.fieldName,
-                        Validated.Valid((validField.value as Validated.Valid<String>).value.toUpperCase())
+                        validField.value.toUpperCase()
                     )
                 }
             }
 
-            "convert value when it's Valid and validation result is Invalid " {
+            "convert value when it's ValidField and validation result is Invalid " {
                 checkAll(validFieldArb(Arb.string()), invalidArb<Int>()) { validField, invalid ->
                     val result = validField.validateValue { invalid }
 
-                    result shouldBe ValidatedField(
-                        validField.fieldName,
-                        Validated.Invalid<Int>(listOf(FieldViolation(validField.fieldName, invalid.violations)))
+                    result shouldBe InvalidField(
+                        FieldViolation(
+                            validField.fieldName,
+                            invalid.violations
+                        )
                     )
                 }
             }
@@ -69,19 +66,20 @@ class ValidatedFieldTest : WordSpec() {
         }
 
         "T.validField" should {
-            "wrap T into ValidatedField with Valid value" {
+            "wrap T into ValidField" {
                 checkAll(Arb.string(), Arb.string()) { value, fieldName ->
-                    value.validField(fieldName) shouldBe ValidatedField(fieldName, Validated.Valid(value))
+                    value.validField(fieldName) shouldBe ValidField(fieldName, value)
                 }
             }
         }
 
         "Violation.invalidField" should {
-            "wrap ValueViolation into ValidatedField with Invalid value" {
+            "wrap Violation into InvalidField" {
                 checkAll(ValueViolationArb, Arb.string()) { violation, fieldName ->
-                    violation.invalidField<Any>(fieldName) shouldBe ValidatedField<Any>(
-                        fieldName, Validated.Invalid(
-                            listOf(FieldViolation(fieldName, listOf(violation)))
+                    violation.invalidField<Any>(fieldName) shouldBe InvalidField(
+                        FieldViolation(
+                            fieldName,
+                            listOf(violation)
                         )
                     )
                 }

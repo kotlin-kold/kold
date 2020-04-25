@@ -1,8 +1,6 @@
 package com.paralainer.kold.context
 
-import com.paralainer.kold.validated.Validated
-import com.paralainer.kold.validated.ValidatedField
-import com.paralainer.kold.validated.Violation
+import com.paralainer.kold.validated.*
 
 fun <R, A> combineFields(v1: ValidatedField<A>, combine: (A) -> R): Validated<R> =
     collectViolations(v1).ifValid { combine(v1.v()) }
@@ -58,16 +56,26 @@ fun <R, A, B, C, D, E, F, G> combineFields(
     v7: ValidatedField<G>,
     combine: (A, B, C, D, E, F, G) -> R
 ): Validated<R> =
-    collectViolations(v1, v2, v3, v4, v5, v6, v7).ifValid { combine(v1.v(), v2.v(), v3.v(), v4.v(), v5.v(), v6.v(), v7.v()) }
+    collectViolations(v1, v2, v3, v4, v5, v6, v7).ifValid {
+        combine(
+            v1.v(),
+            v2.v(),
+            v3.v(),
+            v4.v(),
+            v5.v(),
+            v6.v(),
+            v7.v()
+        )
+    }
 
 
-private fun collectViolations(vararg validations: ValidatedField<*>): List<Violation> =
-    validations.mapNotNull {
-        when (val validated = it.value) {
-            is Validated.Valid -> null
-            is Validated.Invalid -> validated.violations
-        }
-    }.flatten()
+private fun collectViolations(vararg validations: ValidatedField<*>): List<FieldViolation> =
+    validations.mapNotNull { field ->
+        field.fold(
+            onInvalid = { it.violation },
+            onValid = { null }
+        )
+    }
 
 private fun <R> List<Violation>.ifValid(block: () -> R): Validated<R> =
     if (this.isEmpty())
@@ -75,4 +83,4 @@ private fun <R> List<Violation>.ifValid(block: () -> R): Validated<R> =
     else
         Validated.Invalid(this)
 
-private fun <T> ValidatedField<T>.v(): T = (this.value as Validated.Valid<T>).value
+private fun <T> ValidatedField<T>.v(): T = (this as ValidField<T>).value

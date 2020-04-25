@@ -215,7 +215,7 @@ class CombineFieldsTest : WordSpec() {
 
     private fun someInvalidArb(size: Int): Arb<SomeInvalidFields> =
         Arb.list(invalidFieldArb<Any>(), 1..size).flatMap { invalidFields ->
-            val violations = invalidFields.flatMap { (it.value as Validated.Invalid).violations }.toSet()
+            val violations = invalidFields.map { it.violation }.toSet()
 
             if (invalidFields.size == size) {
                 Arb.constant(SomeInvalidFields(invalidFields, violations))

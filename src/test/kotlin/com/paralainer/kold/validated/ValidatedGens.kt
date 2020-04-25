@@ -11,15 +11,13 @@ fun <T> validArb(value: Arb<T>): Arb<Validated.Valid<T>> = value.map { Validated
 
 fun <T> invalidArb(): Arb<Validated.Invalid<T>> = Arb.list(violationArb(), 1..3).map { Validated.Invalid<T>(it) }
 
-fun <T> validFieldArb(value: Arb<T>): Arb<ValidatedField<T>> =
+fun <T> validFieldArb(value: Arb<T>): Arb<ValidField<T>> =
     Arb.string().flatMap { fieldName ->
         value.map { it.validField(fieldName) }
     }
 
-fun <T> invalidFieldArb(): Arb<ValidatedField<T>> =
+fun <T> invalidFieldArb(): Arb<InvalidField<T>> =
     Arb.bind(
         Arb.string(),
         invalidArb<T>()
-    ) { fieldName, invalid ->
-        ValidatedField(fieldName, invalid)
-    }
+    ) { fieldName, invalid -> invalid.violations.invalidField<T>(fieldName) }

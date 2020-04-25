@@ -23,10 +23,7 @@ class OptionalFieldTest : WordSpec() {
                         validationResult
                     }
 
-                    result shouldBe ValidatedField(
-                        fieldName,
-                        validationResult
-                    )
+                    result shouldBe validationResult.validatedField(fieldName)
                 }
             }
 
@@ -39,10 +36,7 @@ class OptionalFieldTest : WordSpec() {
                         validationResult
                     }
 
-                    result shouldBe ValidatedField(
-                        fieldName,
-                        Validated.Valid(null)
-                    )
+                    result shouldBe ValidField(fieldName, null)
                 }
             }
         }

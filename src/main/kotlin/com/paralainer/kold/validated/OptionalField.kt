@@ -4,12 +4,9 @@ import com.paralainer.kold.data.KoldValue
 
 data class OptionalField(val fieldName: String, private val value: KoldValue?) {
     fun <R> validateOption(block: (KoldValue) -> Validated<R>): ValidatedField<R?> =
-        ValidatedField(
-            fieldName,
             if (value == null) {
-                null.valid<R?>()
+                ValidField(fieldName, null)
             } else {
-                block(value) as Validated<R?>
+                block(value).validatedField(fieldName) as ValidatedField<R?>
             }
-        )
 }

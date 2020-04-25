@@ -1,27 +1,50 @@
 package com.paralainer.kold.validated
 
-data class ValidatedField<T>(val fieldName: String, val value: Validated<T>) {
+sealed class ValidatedField<T> {
     fun <R> convertValue(block: (T) -> R): ValidatedField<R> =
-        validateValue { block(it).valid() }
+        fold(
+            onInvalid = { it as InvalidField<R> },
+            onValid = { ValidField(it.fieldName, block(it.value)) }
+        )
 
     fun <R> validateValue(validation: (T) -> Validated<R>): ValidatedField<R> =
-        value.fold(
+        fold(
             onValid = {
-                val validated = validation(it.value).fold(
-                    { invalid -> FieldViolation(fieldName, invalid.violations).invalid<R>() },
-                    { valid -> valid.value.valid() }
+                validation(it.value).fold(
+                    { invalid -> InvalidField<R>(FieldViolation(it.fieldName, invalid.violations)) },
+                    { valid -> valid.value.validField(it.fieldName) }
                 )
-
-                ValidatedField(fieldName, validated)
             },
             onInvalid = {
                 this as ValidatedField<R> // we are saving a memory allocation by casting instead of reconstructing
             }
         )
+
+    fun <R> fold(onInvalid: (InvalidField<T>) -> R, onValid: (ValidField<T>) -> R): R =
+        when (this) {
+            is ValidField -> onValid(this)
+            is InvalidField -> onInvalid(this)
+        }
 }
 
-fun <T> T.validField(fieldName: String): ValidatedField<T> =
-    ValidatedField(fieldName, this.valid())
+data class ValidField<T>(val fieldName: String, val value: T) : ValidatedField<T>()
+data class InvalidField<T>(val violation: FieldViolation) : ValidatedField<T>()
 
-fun <T> ValueViolation.invalidField(fieldName: String): ValidatedField<T> =
-    ValidatedField(fieldName, Validated.Invalid(listOf(FieldViolation(fieldName, listOf(this)))))
+fun <T> Validated<T>.validatedField(fieldName: String): ValidatedField<T> =
+    fold(
+        onInvalid = {
+            it.violations.invalidField(fieldName)
+        },
+        onValid = {
+            it.value.validField(fieldName)
+        }
+    )
+
+fun <T> T.validField(fieldName: String): ValidField<T> =
+    ValidField(fieldName, this)
+
+fun <T> Violation.invalidField(fieldName: String): InvalidField<T> =
+    InvalidField(FieldViolation(fieldName, listOf(this)))
+
+fun <T> List<Violation>.invalidField(fieldName: String): InvalidField<T> =
+    InvalidField(FieldViolation(fieldName, this))
