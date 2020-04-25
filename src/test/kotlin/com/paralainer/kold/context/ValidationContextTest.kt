@@ -3,6 +3,7 @@ package com.paralainer.kold.context
 import com.paralainer.kold.data.*
 import com.paralainer.kold.utils.longRange
 import com.paralainer.kold.utils.number
+import com.paralainer.kold.utils.orNull
 import com.paralainer.kold.validated.OptionalField
 import com.paralainer.kold.validated.Validated
 import com.paralainer.kold.validated.ValueViolation
@@ -17,11 +18,7 @@ import io.kotest.core.spec.style.WordSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.choice
-import io.kotest.property.arbitrary.constant
-import io.kotest.property.arbitrary.long
-import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.*
 import io.kotest.property.checkAll
 
 class ValidationContextTest : WordSpec() {
@@ -79,16 +76,12 @@ class ValidationContextTest : WordSpec() {
         "default" should {
             "return original value when it's not null" {
                 checkAll(validFieldArb(Arb.string() as Arb<String?>), Arb.string()) { validField, default ->
-                    testContext {
-                        validField.default(default) shouldBe validField
-                    }
+                    validField.default(default) shouldBe validField
                 }
             }
             "return default value when it's null" {
                 checkAll(validFieldArb<String?>(Arb.constant(null)), Arb.string()) { validField, default ->
-                    testContext {
-                        validField.default(default) shouldBe default.validField(validField.fieldName)
-                    }
+                    validField.default(default) shouldBe default.validField(validField.fieldName)
                 }
             }
         }
@@ -226,7 +219,7 @@ class ValidationContextTest : WordSpec() {
             "return Validated.Invalid with invalidValue when it's not Number" {
                 checkAll(validArb(StringKoldValueArb)) { valid ->
                     testContext {
-                        valid.long() shouldBe config.invalidValue.invalid()
+                        valid.double() shouldBe config.invalidValue.invalid()
                     }
                 }
             }
@@ -234,8 +227,78 @@ class ValidationContextTest : WordSpec() {
             "pass Invalid when already Invalid" {
                 checkAll(invalidArb<KoldValue>()) { invalid ->
                     testContext {
-                        invalid.long() shouldBeSameInstanceAs invalid
+                        invalid.double() shouldBeSameInstanceAs invalid
                     }
+                }
+            }
+        }
+
+        "Validated<KoldValue>.list" should {
+            "return Validated.Valid<List<KoldValue?>> when it's a list" {
+                checkAll(Arb.list(koldValueArb().orNull(), 1..10)) { list ->
+                    testContext {
+                        val value = Validated.Valid(KoldValue.fromCollection(list))
+                        value.list() shouldBe Validated.Valid(list)
+                    }
+                }
+            }
+
+            "return Validated.Invalid with invalidValue when it's not a list" {
+                checkAll(validArb(LongKoldValueArb)) { valid ->
+                    testContext {
+                        valid.list() shouldBe config.invalidValue.invalid()
+                    }
+                }
+            }
+
+            "pass Invalid when already Invalid" {
+                checkAll(invalidArb<KoldValue>()) { invalid ->
+                    testContext {
+                        invalid.list() shouldBeSameInstanceAs invalid
+                    }
+                }
+            }
+        }
+
+        "Validated<KoldValue>.obj" should {
+            "return Validated.Valid<List<KoldValue?>> when it's KoldData" {
+                checkAll(koldDataArb()) { data ->
+                    testContext {
+                        val value = Validated.Valid(KoldValue.fromObject(data))
+                        value.obj() shouldBe Validated.Valid(data)
+                    }
+                }
+            }
+
+            "return Validated.Invalid with invalidValue when it's not KoldData" {
+                checkAll(validArb(LongKoldValueArb)) { valid ->
+                    testContext {
+                        valid.obj() shouldBe config.invalidValue.invalid()
+                    }
+                }
+            }
+
+            "pass Invalid when already Invalid" {
+                checkAll(invalidArb<KoldValue>()) { invalid ->
+                    testContext {
+                        invalid.obj() shouldBeSameInstanceAs invalid
+                    }
+                }
+            }
+        }
+
+        "R?.notNull" should {
+            "return Validated.Valid<R> when it's not null" {
+                checkAll(Arb.string()) { value ->
+                    testContext {
+                        value.notNull() shouldBe Validated.Valid(value)
+                    }
+                }
+            }
+
+            "return Validated.Invalid with nullValue when it's null" {
+                testContext {
+                    null.notNull() shouldBe config.nullValue.invalid()
                 }
             }
         }
@@ -249,7 +312,8 @@ class ValidationContextTest : WordSpec() {
 
     private val emptyData: KoldData = KoldData(emptyMap())
 
-    private val validIntLongGen: Arb<KoldValue> = Arb.longRange(Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong()).map { KoldValue.fromNumber(it) }
+    private val validIntLongGen: Arb<KoldValue> =
+        Arb.longRange(Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong()).map { KoldValue.fromNumber(it) }
 
     private val overflowIntLongGen: Arb<KoldValue> = Arb.choice(
         Arb.longRange(Long.MIN_VALUE until Int.MIN_VALUE.toLong()),
