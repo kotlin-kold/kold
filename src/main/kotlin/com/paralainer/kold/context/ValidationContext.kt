@@ -44,6 +44,8 @@ class ValidationContext(
     fun KoldValue.double(): Validated<Double> =
         this.number { config.invalidValue }.flatMap { it.toDouble().valid() }
 
+    fun Validated<KoldValue>.double(): Validated<Double> = this.flatMap { it.double() }
+
     fun KoldValue.list(): Validated<List<KoldValue?>> =
         this.list { config.invalidValue }
 
@@ -98,7 +100,10 @@ fun <T, R> T?.validateOption(block: (T) -> Validated<R>): Validated<R?> =
         block(this).flatMap { Validated.Valid(it as R?) }
 
 
-fun <R> KoldData.validationContext(config: ValidationContextConfig = ValidationContextConfig(), validation: ValidationContext.() -> Validated<R>): Validated<R> =
+fun <R> KoldData.validationContext(
+    config: ValidationContextConfig = ValidationContextConfig(),
+    validation: ValidationContext.() -> Validated<R>
+): Validated<R> =
     validation(ValidationContext(this, config))
 
 
