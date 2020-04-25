@@ -4,16 +4,7 @@ import com.paralainer.kold.data.*
 import com.paralainer.kold.utils.longRange
 import com.paralainer.kold.utils.number
 import com.paralainer.kold.utils.orNull
-import com.paralainer.kold.validated.OptionalField
-import com.paralainer.kold.validated.Validated
-import com.paralainer.kold.validated.ValueViolation
-import com.paralainer.kold.validated.invalid
-import com.paralainer.kold.validated.invalidArb
-import com.paralainer.kold.validated.invalidField
-import com.paralainer.kold.validated.valid
-import com.paralainer.kold.validated.validArb
-import com.paralainer.kold.validated.validField
-import com.paralainer.kold.validated.validFieldArb
+import com.paralainer.kold.validated.*
 import io.kotest.core.spec.style.WordSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
@@ -299,6 +290,37 @@ class ValidationContextTest : WordSpec() {
             "return Validated.Invalid with nullValue when it's null" {
                 testContext {
                     null.notNull() shouldBe config.nullValue.invalid()
+                }
+            }
+        }
+
+        "Validated<List<T>>.validateElements" should {
+            "return Validated.Valid<<List<T>> when all elements are valid" {
+                checkAll(validArb(Arb.list(Arb.string(), 1..10))) { validList ->
+                    var index = 0
+                    val result = validList.validateElements {
+                        index++
+                        index.valid()
+                    }
+
+                    result shouldBe (1..index).toList().valid()
+                }
+            }
+
+            "return Validated.Invalid with ElementsViolation when some elements are invalid" {
+                checkAll(Arb.list(validArb(Arb.string()), 0..3), Arb.list(invalidArb<String>(), 1..5)) { listOfValids, listOfInvalids ->
+                    val resultsList = listOfValids.plus(listOfInvalids).shuffled()
+                    var index = 0
+                    val validationResult = (resultsList.indices).toList().valid().validateElements {
+                        val result = resultsList[index]
+                        index++
+                        result
+                    }
+
+                    val invalid = validationResult as Validated.Invalid<*>
+                    invalid.violations.size shouldBe 1
+                    val elementsViolation = invalid.violations.single() as ElementsViolation
+                    elementsViolation.violations.toSet() shouldBe listOfInvalids.flatMap { it.violations }.toSet()
                 }
             }
         }

@@ -2,14 +2,7 @@ package com.paralainer.kold.context
 
 import com.paralainer.kold.data.KoldData
 import com.paralainer.kold.data.KoldValue
-import com.paralainer.kold.validated.ElementsViolation
-import com.paralainer.kold.validated.OptionalField
-import com.paralainer.kold.validated.Validated
-import com.paralainer.kold.validated.ValidatedField
-import com.paralainer.kold.validated.invalid
-import com.paralainer.kold.validated.invalidField
-import com.paralainer.kold.validated.valid
-import com.paralainer.kold.validated.validField
+import com.paralainer.kold.validated.*
 
 class ValidationContext(
     val data: KoldData,
@@ -65,18 +58,25 @@ class ValidationContext(
         }
 }
 
+fun <R> KoldData.validationContext(
+    config: ValidationContextConfig = ValidationContextConfig(),
+    validation: ValidationContext.() -> Validated<R>
+): Validated<R> =
+    validation(ValidationContext(this, config))
+
 fun <T> ValidatedField<T?>.default(default: T): ValidatedField<T> =
     this.convertValue { it ?: default }
+
+fun <T, R> T?.validateOption(block: (T) -> Validated<R>): Validated<R?> =
+    if (this == null)
+        Validated.Valid(null)
+    else
+        block(this).flatMap { Validated.Valid(it as R?) }
 
 fun <T, R> Validated<List<T>>.validateElements(block: (T) -> Validated<R>): Validated<List<R>> =
     this.flatMap { list ->
         val validatedElements = list.map { block(it) }
-        val violations = validatedElements.mapNotNull {
-            when (it) {
-                is Validated.Valid -> null
-                is Validated.Invalid -> it.violations
-            }
-        }.flatten().toSet()
+        val violations = collectViolations(validatedElements)
 
         if (violations.isEmpty()) {
             validatedElements.map { (it as Validated.Valid<R>).value }.valid()
@@ -85,17 +85,14 @@ fun <T, R> Validated<List<T>>.validateElements(block: (T) -> Validated<R>): Vali
         }
     }
 
-fun <T, R> T?.validateOption(block: (T) -> Validated<R>): Validated<R?> =
-    if (this == null)
-        Validated.Valid(null)
-    else
-        block(this).flatMap { Validated.Valid(it as R?) }
 
-
-fun <R> KoldData.validationContext(
-    config: ValidationContextConfig = ValidationContextConfig(),
-    validation: ValidationContext.() -> Validated<R>
-): Validated<R> =
-    validation(ValidationContext(this, config))
+private fun <R> collectViolations(validatedElements: List<Validated<R>>): Set<Violation> {
+    return validatedElements.mapNotNull {
+        when (it) {
+            is Validated.Valid -> null
+            is Validated.Invalid -> it.violations
+        }
+    }.flatten().toSet()
+}
 
 
