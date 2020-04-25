@@ -308,7 +308,10 @@ class ValidationContextTest : WordSpec() {
             }
 
             "return Validated.Invalid with ElementsViolation when some elements are invalid" {
-                checkAll(Arb.list(validArb(Arb.string()), 0..3), Arb.list(invalidArb<String>(), 1..5)) { listOfValids, listOfInvalids ->
+                checkAll(
+                    Arb.list(validArb(Arb.string()), 0..3),
+                    Arb.list(invalidArb<String>(), 1..5)
+                ) { listOfValids, listOfInvalids ->
                     val resultsList = listOfValids.plus(listOfInvalids).shuffled()
                     var index = 0
                     val validationResult = (resultsList.indices).toList().valid().validateElements {
@@ -321,6 +324,46 @@ class ValidationContextTest : WordSpec() {
                     invalid.violations.size shouldBe 1
                     val elementsViolation = invalid.violations.single() as ElementsViolation
                     elementsViolation.violations.toSet() shouldBe listOfInvalids.flatMap { it.violations }.toSet()
+                }
+            }
+        }
+
+        "R?.validateOption" should {
+            "convert value when it's not null" {
+                checkAll(
+                    Arb.string(),
+                    Arb.choice<Validated<Int>>(validArb(Arb.int()), invalidArb())
+                ) { value, validationResult ->
+                    val result = value.validateOption {
+                        it shouldBe value
+                        validationResult
+                    }
+
+                    result shouldBe validationResult
+                }
+            }
+
+            "use null as valid value when it' koldValue = null" {
+                checkAll(
+                    Arb.choice<Validated<Int>>(validArb(Arb.int()), invalidArb())
+                ) { validationResult ->
+                    val result = null.validateOption {
+                        validationResult
+                    }
+
+                    result shouldBe Validated.Valid(null)
+                }
+            }
+        }
+
+        "validationContext()" should {
+            "use default config" {
+                checkAll(koldDataArb()) { value ->
+                    value.validationContext {
+                        config shouldBe ValidationContextConfig()
+                        Unit.valid()
+                    }
+
                 }
             }
         }

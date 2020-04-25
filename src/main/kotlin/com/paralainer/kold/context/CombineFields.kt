@@ -4,13 +4,13 @@ import com.paralainer.kold.validated.Validated
 import com.paralainer.kold.validated.ValidatedField
 import com.paralainer.kold.validated.Violation
 
-fun <R, A> validateFields(v1: ValidatedField<A>, combine: (A) -> R): Validated<R> =
+fun <R, A> combineFields(v1: ValidatedField<A>, combine: (A) -> R): Validated<R> =
     collectViolations(v1).ifValid { combine(v1.v()) }
 
-fun <R, A, B> validateFields(v1: ValidatedField<A>, v2: ValidatedField<B>, combine: (A, B) -> R): Validated<R> =
+fun <R, A, B> combineFields(v1: ValidatedField<A>, v2: ValidatedField<B>, combine: (A, B) -> R): Validated<R> =
     collectViolations(v1, v2).ifValid { combine(v1.v(), v2.v()) }
 
-fun <R, A, B, C> validateFields(
+fun <R, A, B, C> combineFields(
     v1: ValidatedField<A>,
     v2: ValidatedField<B>,
     v3: ValidatedField<C>,
@@ -18,7 +18,7 @@ fun <R, A, B, C> validateFields(
 ): Validated<R> =
     collectViolations(v1, v2, v3).ifValid { combine(v1.v(), v2.v(), v3.v()) }
 
-fun <R, A, B, C, D> validateFields(
+fun <R, A, B, C, D> combineFields(
     v1: ValidatedField<A>,
     v2: ValidatedField<B>,
     v3: ValidatedField<C>,
@@ -27,7 +27,7 @@ fun <R, A, B, C, D> validateFields(
 ): Validated<R> =
     collectViolations(v1, v2, v3, v4).ifValid { combine(v1.v(), v2.v(), v3.v(), v4.v()) }
 
-fun <R, A, B, C, D, E> validateFields(
+fun <R, A, B, C, D, E> combineFields(
     v1: ValidatedField<A>,
     v2: ValidatedField<B>,
     v3: ValidatedField<C>,
@@ -37,7 +37,7 @@ fun <R, A, B, C, D, E> validateFields(
 ): Validated<R> =
     collectViolations(v1, v2, v3, v4, v5).ifValid { combine(v1.v(), v2.v(), v3.v(), v4.v(), v5.v()) }
 
-fun <R, A, B, C, D, E, F> validateFields(
+fun <R, A, B, C, D, E, F> combineFields(
     v1: ValidatedField<A>,
     v2: ValidatedField<B>,
     v3: ValidatedField<C>,
@@ -48,7 +48,7 @@ fun <R, A, B, C, D, E, F> validateFields(
 ): Validated<R> =
     collectViolations(v1, v2, v3, v4, v5, v6).ifValid { combine(v1.v(), v2.v(), v3.v(), v4.v(), v5.v(), v6.v()) }
 
-fun <R, A, B, C, D, E, F, G> validateFields(
+fun <R, A, B, C, D, E, F, G> combineFields(
     v1: ValidatedField<A>,
     v2: ValidatedField<B>,
     v3: ValidatedField<C>,

@@ -6,7 +6,7 @@ import com.paralainer.kold.validated.*
 
 class ValidationContext(
     val data: KoldData,
-    val config: ValidationContextConfig = ValidationContextConfig()
+    val config: ValidationContextConfig
 ) {
     fun require(fieldName: String): ValidatedField<KoldValue> =
         data[fieldName]?.validField(fieldName) ?: config.nullValue.invalidField(fieldName)
