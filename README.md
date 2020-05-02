@@ -62,4 +62,4 @@ fun validateUser(input: KoldData): Validated<User> =
 More examples can be found in `kold-examples` module.
 
 ### KoldData
-
+KoldData is a type safe representation of json-like data. It allows you to store strings, numbers, booleans and also arrays and objects containing fields of such types. 

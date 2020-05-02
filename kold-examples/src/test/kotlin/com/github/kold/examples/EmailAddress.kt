@@ -2,8 +2,6 @@ package com.github.kold.examples
 
 import com.github.kold.validated.Validated
 import com.github.kold.validated.ValueViolation
-import com.github.kold.validated.valid
-
 
 class EmailAddress private constructor(val value: String) {
     companion object {
