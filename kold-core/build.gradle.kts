@@ -1,5 +1,7 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm").version("1.3.71")
+    id("java")
+    id("java-library")
+    id("kotlin-multiplatform")
     `maven-publish`
 }
 
@@ -16,11 +18,15 @@ tasks.withType<Test> {
 }
 
 kotlin {
-    target {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
+    targets {
+        jvm {
+            compilations.all {
+                kotlinOptions {
+                    jvmTarget = "1.8"
+                }
             }
         }
     }
 }
+
+apply(from = "../publish-sonatype.gradle.kts")
