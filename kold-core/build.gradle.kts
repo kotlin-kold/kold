@@ -17,7 +17,7 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            kotlin.srcDir("src/main")
+            kotlin.srcDir("src/main/kotlin")
             dependencies {
                 implementation(kotlin("stdlib-common"))
             }
@@ -31,7 +31,7 @@ kotlin {
         }
 
         val jvmTest by getting {
-            kotlin.srcDir("src/test")
+            kotlin.srcDir("src/test/kotlin")
             dependsOn(jvmMain)
             dependencies {
                 implementation("io.kotest:kotest-runner-junit5-jvm:4.0.3")
