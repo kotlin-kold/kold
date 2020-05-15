@@ -8,6 +8,9 @@ repositories {
     mavenCentral()
 }
 
+val ossrhUsername: String by project
+val ossrhPassword: String by project
+
 fun Project.publishing(action: PublishingExtension.() -> Unit) =
     configure(action)
 
@@ -40,8 +43,8 @@ publishing {
             name = "sonatype"
             url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
             credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
+                username = ossrhUsername
+                password = ossrhPassword
             }
         }
     }

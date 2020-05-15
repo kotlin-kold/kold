@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 buildscript {
     repositories {
         mavenCentral()
@@ -17,7 +15,7 @@ plugins {
 }
 
 allprojects {
-    version = "0.1"
+    version = "0.1.1"
     repositories {
         mavenLocal()
         mavenCentral()
