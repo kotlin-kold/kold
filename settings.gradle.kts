@@ -1,4 +1,5 @@
 rootProject.name = "kold"
 
 include("kold-core")
-//include("kold-examples")
+include("kold-spring")
+include("kold-examples")

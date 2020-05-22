@@ -15,7 +15,7 @@ kotlin {
 
     sourceSets {
         val jvmMain by getting {
-            kotlin.srcDir("src/main")
+            kotlin.srcDir("src/main/kotlin")
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
                 api(project(":kold-core"))
