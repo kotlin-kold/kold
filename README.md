@@ -5,7 +5,7 @@ This library is for validating raw data _before_ constructing an object.
 ### When to use it
 There are a couple of use-cases
 * Validating value-objects like `EmailAddress`
-* Validating fields of on object
+* Validating fields of an object
 
 #### Validating value-objects
 Imagine you have some values that should follow certain rules to be valid like email address.
