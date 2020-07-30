@@ -192,6 +192,114 @@ class CombineFieldsTest : WordSpec() {
                 }
             }
         }
+        "combineFields with 8 args" should {
+            "call combine function with correct args when Valid" {
+                checkAll(validArgumentsArb(8)) { args ->
+                    val result = combineFields(
+                        toValidField(args[0]),
+                        toValidField(args[1]),
+                        toValidField(args[2]),
+                        toValidField(args[3]),
+                        toValidField(args[4]),
+                        toValidField(args[5]),
+                        toValidField(args[6]),
+                        toValidField(args[7])
+                    ) { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 -> listOf(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) }
+                    result shouldBe listOf(args[0].second, args[1].second, args[2].second, args[3].second, args[4].second, args[5].second, args[6].second, args[7].second).valid()
+                }
+            }
+
+            "return Violations when some fields are Invalid" {
+                checkAll(someInvalidArb(8)) { someInvalidFields ->
+                    val result = combineFields(
+                        someInvalidFields.fields[0],
+                        someInvalidFields.fields[1],
+                        someInvalidFields.fields[2],
+                        someInvalidFields.fields[3],
+                        someInvalidFields.fields[4],
+                        someInvalidFields.fields[5],
+                        someInvalidFields.fields[6],
+                        someInvalidFields.fields[7]
+                    ) { _, _, _, _, _, _, _, _ -> Unit }
+                    val invalid = result as Validated.Invalid
+                    invalid.violations.toSet() shouldBe someInvalidFields.violations
+                }
+            }
+        }
+        "combineFields with 9 args" should {
+            "call combine function with correct args when Valid" {
+                checkAll(validArgumentsArb(9)) { args ->
+                    val result = combineFields(
+                        toValidField(args[0]),
+                        toValidField(args[1]),
+                        toValidField(args[2]),
+                        toValidField(args[3]),
+                        toValidField(args[4]),
+                        toValidField(args[5]),
+                        toValidField(args[6]),
+                        toValidField(args[7]),
+                        toValidField(args[8])
+                    ) { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 -> listOf(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) }
+                    result shouldBe listOf(args[0].second, args[1].second, args[2].second, args[3].second, args[4].second, args[5].second, args[6].second, args[7].second, args[8].second).valid()
+                }
+            }
+
+            "return Violations when some fields are Invalid" {
+                checkAll(someInvalidArb(9)) { someInvalidFields ->
+                    val result = combineFields(
+                        someInvalidFields.fields[0],
+                        someInvalidFields.fields[1],
+                        someInvalidFields.fields[2],
+                        someInvalidFields.fields[3],
+                        someInvalidFields.fields[4],
+                        someInvalidFields.fields[5],
+                        someInvalidFields.fields[6],
+                        someInvalidFields.fields[7],
+                        someInvalidFields.fields[8]
+                    ) { _, _, _, _, _, _, _, _, _ -> Unit }
+                    val invalid = result as Validated.Invalid
+                    invalid.violations.toSet() shouldBe someInvalidFields.violations
+                }
+            }
+        }
+        "combineFields with 10 args" should {
+            "call combine function with correct args when Valid" {
+                checkAll(validArgumentsArb(10)) { args ->
+                    val result = combineFields(
+                        toValidField(args[0]),
+                        toValidField(args[1]),
+                        toValidField(args[2]),
+                        toValidField(args[3]),
+                        toValidField(args[4]),
+                        toValidField(args[5]),
+                        toValidField(args[6]),
+                        toValidField(args[7]),
+                        toValidField(args[8]),
+                        toValidField(args[9])
+                    ) { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10 -> listOf(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10) }
+                    result shouldBe listOf(args[0].second, args[1].second, args[2].second, args[3].second, args[4].second, args[5].second, args[6].second, args[7].second, args[8].second, args[9].second).valid()
+                }
+            }
+
+            "return Violations when some fields are Invalid" {
+                checkAll(someInvalidArb(10)) { someInvalidFields ->
+                    val result = combineFields(
+                        someInvalidFields.fields[0],
+                        someInvalidFields.fields[1],
+                        someInvalidFields.fields[2],
+                        someInvalidFields.fields[3],
+                        someInvalidFields.fields[4],
+                        someInvalidFields.fields[5],
+                        someInvalidFields.fields[6],
+                        someInvalidFields.fields[7],
+                        someInvalidFields.fields[8],
+                        someInvalidFields.fields[9]
+                    ) { _, _, _, _, _, _, _, _, _, _ -> Unit }
+                    val invalid = result as Validated.Invalid
+                    invalid.violations.toSet() shouldBe someInvalidFields.violations
+                }
+            }
+        }
 
     }
 

@@ -68,6 +68,84 @@ fun <R, A, B, C, D, E, F, G> combineFields(
         )
     }
 
+fun <R, A, B, C, D, E, F, G, H> combineFields(
+    v1: ValidatedField<A>,
+    v2: ValidatedField<B>,
+    v3: ValidatedField<C>,
+    v4: ValidatedField<D>,
+    v5: ValidatedField<E>,
+    v6: ValidatedField<F>,
+    v7: ValidatedField<G>,
+    v8: ValidatedField<H>,
+    combine: (A, B, C, D, E, F, G, H) -> R
+): Validated<R> =
+    collectViolations(v1, v2, v3, v4, v5, v6, v7, v8).ifValid {
+        combine(
+            v1.v(),
+            v2.v(),
+            v3.v(),
+            v4.v(),
+            v5.v(),
+            v6.v(),
+            v7.v(),
+            v8.v()
+        )
+    }
+
+fun <R, A, B, C, D, E, F, G, H, I> combineFields(
+    v1: ValidatedField<A>,
+    v2: ValidatedField<B>,
+    v3: ValidatedField<C>,
+    v4: ValidatedField<D>,
+    v5: ValidatedField<E>,
+    v6: ValidatedField<F>,
+    v7: ValidatedField<G>,
+    v8: ValidatedField<H>,
+    v9: ValidatedField<I>,
+    combine: (A, B, C, D, E, F, G, H, I) -> R
+): Validated<R> =
+    collectViolations(v1, v2, v3, v4, v5, v6, v7, v8, v9).ifValid {
+        combine(
+            v1.v(),
+            v2.v(),
+            v3.v(),
+            v4.v(),
+            v5.v(),
+            v6.v(),
+            v7.v(),
+            v8.v(),
+            v9.v()
+        )
+    }
+
+fun <R, A, B, C, D, E, F, G, H, I, J> combineFields(
+    v1: ValidatedField<A>,
+    v2: ValidatedField<B>,
+    v3: ValidatedField<C>,
+    v4: ValidatedField<D>,
+    v5: ValidatedField<E>,
+    v6: ValidatedField<F>,
+    v7: ValidatedField<G>,
+    v8: ValidatedField<H>,
+    v9: ValidatedField<I>,
+    v10: ValidatedField<J>,
+    combine: (A, B, C, D, E, F, G, H, I, J) -> R
+): Validated<R> =
+    collectViolations(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10).ifValid {
+        combine(
+            v1.v(),
+            v2.v(),
+            v3.v(),
+            v4.v(),
+            v5.v(),
+            v6.v(),
+            v7.v(),
+            v8.v(),
+            v9.v(),
+            v10.v()
+        )
+    }
+
 
 private fun collectViolations(vararg validations: ValidatedField<*>): List<FieldViolation> =
     validations.mapNotNull { field ->
