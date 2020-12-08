@@ -7,6 +7,8 @@ repositories {
     mavenCentral()
 }
 
+val javadoc = tasks.named("javadoc")
+
 val ossrhUsername: String by project
 val ossrhPassword: String by project
 
@@ -21,6 +23,13 @@ val publications: PublicationContainer = (extensions.getByName("publishing") as 
 signing {
     if (!version.toString().endsWith("SNAPSHOT"))
         sign(publications)
+}
+
+val javadocJar by tasks.creating(Jar::class) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    description = "Assembles java doc to jar"
+    archiveClassifier.set("javadoc")
+    from(javadoc)
 }
 
 publishing {
@@ -39,6 +48,7 @@ publishing {
 
     publications.withType<MavenPublication>().forEach {
         it.apply {
+            artifact(javadocJar)
             pom {
                 name.set("Kold")
                 description.set("Validation library for Kotlin")
