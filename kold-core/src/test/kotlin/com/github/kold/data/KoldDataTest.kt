@@ -15,6 +15,20 @@ import io.kotest.property.checkAll
 
 class KoldDataTest : WordSpec() {
     init {
+
+        "KoldData.toMap" should {
+            "convert all values using provided function" {
+                checkAll(koldDataArb()) { data ->
+                   val map = data.toMap { key, value ->
+                       data.data[key] shouldBe value
+
+                       value.value
+                   }
+
+                   map shouldBe data.data.mapValues { it.value?.value }
+                }
+            }
+        }
         "KoldData.fromMap" should {
             "parse into KoldData when all the values are correct" {
                 checkAll(koldDataArb()) { data ->

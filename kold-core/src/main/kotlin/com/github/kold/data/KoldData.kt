@@ -4,6 +4,15 @@ class KoldData(internal val data: Map<String, KoldValue?>) {
     operator fun get(fieldName: String): KoldValue? = data[fieldName]
     fun contains(fieldName: String): Boolean = data.containsKey(fieldName)
 
+    fun <V> toMap(mapValue: (String, KoldValue) -> V): Map<String, V?> =
+        data.mapValues { (key, value) ->
+            if (value != null) {
+                mapValue(key, value)
+            } else {
+                null
+            }
+        }
+
     companion object {
         fun fromMap(map: Map<String, Any?>): KoldData =
             parseMap(map)
