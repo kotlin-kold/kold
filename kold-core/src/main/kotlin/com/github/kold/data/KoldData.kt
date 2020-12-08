@@ -1,17 +1,32 @@
 package com.github.kold.data
 
+import com.github.kold.validated.*
+
 class KoldData(internal val data: Map<String, KoldValue?>) {
     operator fun get(fieldName: String): KoldValue? = data[fieldName]
     fun contains(fieldName: String): Boolean = data.containsKey(fieldName)
 
-    fun <V> toMap(mapValue: (String, KoldValue) -> V): Map<String, V?> =
-        data.mapValues { (key, value) ->
-            if (value != null) {
-                mapValue(key, value)
-            } else {
-                null
-            }
+    fun <V> toMap(validateValue: (String, KoldValue?) -> Validated<V>): Validated<Map<String, V>> {
+        val validatedMap = data.mapValues { (key, value) ->
+            validateValue(key, value)
         }
+
+        val violations = collectViolations(validatedMap.values)
+
+        return if (violations.isEmpty()) {
+            validatedMap.mapValues { (it.value as Validated.Valid).value }.valid()
+        } else {
+            ElementsViolation(violations).invalid()
+        }
+    }
+
+    private fun <V> collectViolations(validations: Collection<Validated<V>>): List<Violation> =
+        validations.mapNotNull { field ->
+            field.fold(
+                onInvalid = { it.violations },
+                onValid = { null }
+            )
+        }.flatten()
 
     companion object {
         fun fromMap(map: Map<String, Any?>): KoldData =

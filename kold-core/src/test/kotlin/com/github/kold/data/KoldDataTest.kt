@@ -2,9 +2,16 @@ package com.github.kold.data
 
 import com.github.kold.utils.number
 import com.github.kold.utils.orNull
+import com.github.kold.validated.Validated
+import com.github.kold.validated.ValueViolation
+import com.github.kold.validated.invalid
+import com.github.kold.validated.valid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.WordSpec
+import io.kotest.matchers.beInstanceOf
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.beInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.bool
 import io.kotest.property.arbitrary.choice
@@ -12,6 +19,7 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import io.kotest.matchers.types.shouldBeInstanceOf
 
 class KoldDataTest : WordSpec() {
     init {
@@ -19,13 +27,25 @@ class KoldDataTest : WordSpec() {
         "KoldData.toMap" should {
             "convert all values using provided function" {
                 checkAll(koldDataArb()) { data ->
-                   val map = data.toMap { key, value ->
+                   val result = data.toMap { key, value ->
                        data.data[key] shouldBe value
 
-                       value.value
+                       value?.value.valid()
                    }
 
-                   map shouldBe data.data.mapValues { it.value?.value }
+                    result shouldBe data.data.mapValues { it.value?.value }.valid()
+                }
+            }
+
+            "return Invalid if some values are invalid" {
+                checkAll(koldDataArb()) { data ->
+                   val result = data.toMap { key, value ->
+                       data.data[key] shouldBe value
+
+                       ValueViolation("abc").invalid<Any>()
+                   }
+
+                    result.shouldBeInstanceOf<Validated.Invalid<Any>>()
                 }
             }
         }
