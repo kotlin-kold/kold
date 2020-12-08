@@ -17,20 +17,3 @@ fun Arb.Companion.number(): Arb<Number> = Arb.choice(
     Arb.float(),
     Arb.wholeNumber()
 )
-
-
-fun Arb.Companion.longRange(range: LongRange): Arb<Long> {
-    val edgecases = mutableListOf(range.first, range.last)
-    if (range.contains(0)) {
-        edgecases.add(0)
-    }
-    return arb(LongShrinker, edgecases) { it.random.nextLong(range) }
-}
-
-fun Arb.Companion.intRange(range: IntRange): Arb<Int> {
-    val edgecases = mutableListOf(range.first, range.last)
-    if (range.contains(0)) {
-        edgecases.add(0)
-    }
-    return arb(IntShrinker, edgecases) { it.random.nextInt(range.first, range.last) }
-}

@@ -22,9 +22,9 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-jdk8"))
                 api(project(":kold-core"))
-                implementation("org.springframework.boot:spring-boot-starter:2.3.0.RELEASE")
-                implementation("com.fasterxml.jackson.core:jackson-core:2.11.0")
-                implementation("com.fasterxml.jackson.core:jackson-databind:2.11.0")
+                implementation("org.springframework.boot:spring-boot-starter:2.4.0")
+                implementation("com.fasterxml.jackson.core:jackson-core:2.12.0")
+                implementation("com.fasterxml.jackson.core:jackson-databind:2.12.0")
             }
         }
 
@@ -32,9 +32,9 @@ kotlin {
             kotlin.srcDir("src/test/kotlin")
             dependsOn(jvmMain)
             dependencies {
-                implementation("io.kotest:kotest-runner-junit5-jvm:4.0.3")
-                implementation("io.kotest:kotest-assertions-core-jvm:4.0.3")
-                implementation("io.kotest:kotest-property-jvm:4.0.3")
+                implementation("io.kotest:kotest-runner-junit5-jvm:4.3.1")
+                implementation("io.kotest:kotest-assertions-core-jvm:4.3.1")
+                implementation("io.kotest:kotest-property-jvm:4.3.1")
             }
 
         }

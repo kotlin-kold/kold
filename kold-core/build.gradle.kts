@@ -34,9 +34,9 @@ kotlin {
             kotlin.srcDir("src/test/kotlin")
             dependsOn(jvmMain)
             dependencies {
-                implementation("io.kotest:kotest-runner-junit5-jvm:4.0.3")
-                implementation("io.kotest:kotest-assertions-core-jvm:4.0.3")
-                implementation("io.kotest:kotest-property-jvm:4.0.3")
+                implementation("io.kotest:kotest-runner-junit5-jvm:4.3.1")
+                implementation("io.kotest:kotest-assertions-core-jvm:4.3.1")
+                implementation("io.kotest:kotest-property-jvm:4.3.1")
             }
 
         }

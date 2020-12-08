@@ -1,7 +1,6 @@
 package com.github.kold.context
 
 import com.github.kold.data.*
-import com.github.kold.utils.longRange
 import com.github.kold.utils.number
 import com.github.kold.utils.orNull
 import com.github.kold.validated.*
@@ -378,11 +377,11 @@ class ValidationContextTest : WordSpec() {
     private val emptyData: KoldData = KoldData(emptyMap())
 
     private val validIntLongGen: Arb<KoldValue> =
-        Arb.longRange(Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong()).map { KoldValue.fromNumber(it) }
+        Arb.long(Int.MIN_VALUE.toLong()..Int.MAX_VALUE.toLong()).map { KoldValue.fromNumber(it) }
 
     private val overflowIntLongGen: Arb<KoldValue> = Arb.choice(
-        Arb.longRange(Long.MIN_VALUE until Int.MIN_VALUE.toLong()),
-        Arb.longRange((Int.MAX_VALUE.toLong() + 1L)..Long.MAX_VALUE)
+        Arb.long(Long.MIN_VALUE until Int.MIN_VALUE.toLong()),
+        Arb.long((Int.MAX_VALUE.toLong() + 1L)..Long.MAX_VALUE)
     ).map { KoldValue.fromNumber(it) }
 
     private fun testContext(data: KoldData = emptyData, validate: ValidationContext.() -> Unit): Validated<Unit> =
