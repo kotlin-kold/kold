@@ -1,7 +1,7 @@
 plugins {
     id("java")
     id("java-library")
-    kotlin("multiplatform")
+    kotlin("multiplatform") version "1.4.20"
 }
 
 kotlin {
